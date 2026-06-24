@@ -166,8 +166,10 @@ may refuse to read CAPTCHAs (safety policy).
    > If the full data URL is too long for one return, split into chunks and
    > reassemble in `execute_code`.
 2. Save to a PNG file using `execute_code` (base64 decode)
-3. Send the image to the user via `send_message` with `MEDIA:<path>`
-4. Ask the user to read the CAPTCHA text via `clarify`
+3. Send the image back to the user **in the same conversation/DM the request
+   came from** via `send_message` with `MEDIA:<path>` — reply to the active
+   thread; do not post to a separate or hardcoded channel.
+4. Ask the user to read the CAPTCHA text via `clarify` (same thread)
 5. Type the answer into the captcha input and click Submit
 
 **Alternative:** Use the "Play Audio" button for an audio CAPTCHA if the text

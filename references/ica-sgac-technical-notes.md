@@ -109,8 +109,10 @@ import base64
 
 ### Sending to user
 
-Send the CAPTCHA image to the user via `send_message` with `MEDIA:<path>`,
-then use `clarify` to ask for the CAPTCHA text.
+Send the CAPTCHA image back to the user **in the same conversation/DM the
+request came from** via `send_message` with `MEDIA:<path>`, then use `clarify`
+to ask for the CAPTCHA text in that same thread. Always reply to the active
+conversation — do not route to a separate or hardcoded channel.
 
 ### Vision model limitation
 
