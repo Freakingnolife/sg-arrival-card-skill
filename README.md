@@ -22,6 +22,7 @@ sg-arrival-card-skill/
 ├── README.md                             # This file
 ├── LICENSE                               # MIT License
 ├── references/
+│   ├── portability.md                    # Capability → tool mapping per agent
 │   └── ica-sgac-technical-notes.md       # Detailed Angular form interaction patterns
 └── scripts/                              # Bundled browser-automation helpers
     ├── js_click_by_text.js               # JS-click an Angular button by text
@@ -52,7 +53,8 @@ Multiple travellers on the same pathway can be submitted together using the "Add
 ### CAPTCHA Handling
 - Extracts CAPTCHA image as base64 from the dialog
 - Saves to PNG and sends it back to the user **in the same conversation/DM**,
-  delivered losslessly (`[[as_document]]`) so the distorted text stays legible
+  delivered losslessly (as a file/document, e.g. `[[as_document]]` on Hermes) so
+  the distorted text stays legible
 - User reads and returns the code; agent types it in
 
 ### Safety
@@ -65,17 +67,28 @@ Multiple travellers on the same pathway can be submitted together using the "Add
 
 ## Usage
 
-This skill is designed for AI agents with browser automation capabilities (e.g. [Hermes Agent](https://hermes-agent.nousresearch.com/)). Load the skill, follow the step-by-step workflow in `SKILL.md`, and use the technical reference for specific Angular interaction patterns.
+This skill is **capability-first** and portable across agents — it follows the
+[agentskills.io](https://agentskills.io) open standard, so the `SKILL.md` +
+`scripts/` + `references/` layout loads on [Hermes Agent](https://hermes-agent.nousresearch.com/),
+Claude Code, OpenClaw, and Codex CLI. The workflow refers to abstract
+capabilities; bind them to your agent's concrete tools using
+[`references/portability.md`](references/portability.md). Load the skill, follow
+the workflow in `SKILL.md`, and use the technical reference for Angular
+interaction details.
 
 ## Requirements
 
-- Browser with CDP (Chrome DevTools Protocol) access
-- `browser_navigate`, `browser_click`, `browser_type`, `browser_press`,
-  `browser_console` tools (`browser_press` is required for the Tab-to-validate
-  step on Angular forms)
-- `execute_code` for decoding/saving the CAPTCHA image
-- `vision_analyze` for reading passport/LTVP documents
-- Messaging capability to send CAPTCHA images to a human user
+The skill needs an agent that can provide these capabilities (see
+[`references/portability.md`](references/portability.md) for the per-agent tool
+mapping):
+
+- **Browser automation** — open a URL, click, type, press Tab, and run
+  JavaScript in the page (typically via a CDP/MCP browser tool). The Tab/blur
+  step is required for Angular form validation.
+- **Host-side code execution** — to decode/save the CAPTCHA image.
+- **Vision** — to read passport/pass documents.
+- **User interaction** — to ask the user a question and to send them the CAPTCHA
+  image (delivered losslessly).
 
 ## License
 

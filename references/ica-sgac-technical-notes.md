@@ -1,5 +1,10 @@
 # ICA SGAC — Technical Notes for Browser Automation
 
+These notes use the **capability** names defined in `SKILL.md` (Click, Type,
+Commit, PageJS, RunCode, ReadDoc, AskUser, SendFile). Map them to your agent's
+concrete tools via `references/portability.md`. Script paths are relative to the
+skill directory (on Hermes, prefix with `${HERMES_SKILL_DIR}/`).
+
 ## Angular SPA Architecture
 
 The ICA SGAC portal (`eservices.ica.gov.sg/sgarrivalcard/`) is an Angular
@@ -7,11 +12,11 @@ single-page application. Key implications for browser automation:
 
 ### Button Clicks
 
-Standard `browser_click` (CDP `Input.dispatchMouseEvent`) sometimes fails to
-trigger Angular's `(click)` event bindings. The click "lands" on the DOM
-element but Angular's change detection doesn't fire.
+A normal **Click** (CDP `Input.dispatchMouseEvent` under the hood) sometimes
+fails to trigger Angular's `(click)` event bindings. The click "lands" on the
+DOM element but Angular's change detection doesn't fire.
 
-**Fix:** Use JS `.click()` via `browser_console`:
+**Fix:** Run JS `.click()` via **PageJS** (see `scripts/js_click_by_text.js`):
 ```javascript
 (function() {
   const btns = document.querySelectorAll('button');
@@ -35,9 +40,9 @@ input.dispatchEvent(new Event('input'));  // Sometimes works, sometimes doesn't
 ```
 
 **What works reliably:**
-1. `browser_click` on the input ref (focuses it)
-2. `browser_type` the value (simulates real keyboard input)
-3. `browser_press` Tab key (triggers blur → Angular validates)
+1. **Click** the input ref (focuses it)
+2. **Type** the value (simulates real keyboard input)
+3. **Commit** by pressing Tab (triggers blur → Angular validates)
 
 ### YES/NO Toggle Buttons
 
@@ -56,15 +61,15 @@ document.querySelectorAll('button').forEach(b => {
 });
 ```
 
-Set confirmed-NO buttons (bundled helper — only after confirming the answer):
-`${HERMES_SKILL_DIR}/scripts/set_health_no.js`
+Set confirmed-NO buttons via **PageJS** (bundled helper — only after confirming
+the answer): `scripts/set_health_no.js`
 
 ### Declaration Checkbox
 
 On the review page, the declaration checkbox is a native `<input type="checkbox">`
-but `browser_click` on the ref may not register. JS click works — use the
-bundled helper, which ticks it and returns the resulting state:
-`${HERMES_SKILL_DIR}/scripts/check_declaration.js`
+but a normal **Click** on the ref may not register. JS click works — use the
+bundled helper via **PageJS**, which ticks it and returns the resulting state:
+`scripts/check_declaration.js`
 
 Verify: `document.querySelector('input[type="checkbox"]').checked` → `true`
 
@@ -77,29 +82,29 @@ in an `<img>` tag inside a `[role="dialog"]` container.
 
 Two bundled helpers do this — no inline generation needed:
 
-1. **Extract** via `browser_console`:
-   `${HERMES_SKILL_DIR}/scripts/extract_captcha.js` — returns
+1. **Extract** via **PageJS**: `scripts/extract_captcha.js` — returns
    `{total, numChunks, chunks}` (chunked so long data URLs survive the return).
-2. **Reassemble + save** via `execute_code`:
-   `${HERMES_SKILL_DIR}/scripts/save_captcha.py` — pass the `chunks` list to
-   `save_captcha(chunks)`; it base64-decodes and writes the PNG (default
-   `/tmp/captcha_sgac.png`).
+2. **Reassemble + save** via **RunCode**: `scripts/save_captcha.py` — pass the
+   `chunks` list to `save_captcha(chunks)`; it base64-decodes and writes the PNG
+   (default `/tmp/captcha_sgac.png`).
 
 ### Sending to user
 
-Send the CAPTCHA image back to the user **in the same conversation/DM the
-request came from** via `send_message` with `MEDIA:<path>`, then use `clarify`
-to ask for the CAPTCHA text in that same thread. Always reply to the active
-conversation — do not route to a separate or hardcoded channel.
+**SendFile** the CAPTCHA image back to the user **in the same conversation/DM
+the request came from**, then **AskUser** for the CAPTCHA text in that same
+thread. Always reply to the active conversation — do not route to a separate or
+hardcoded channel.
 
-Use the `[[as_document]]` directive when sending the image so it is delivered
-**losslessly** — messaging-platform compression can blur the distorted text and
-make the CAPTCHA unreadable.
+Deliver the image **losslessly** (as a file/document, not a re-compressed inline
+preview) — messaging-platform compression can blur the distorted text and make
+the CAPTCHA unreadable. On Hermes this is the `[[as_document]]` directive; see
+`references/portability.md` for other agents.
 
 ### Vision model limitation
 
-`vision_analyze` may refuse to read CAPTCHA text due to safety policies around
-"bypassing security measures." This is expected — always route to the user.
+A vision model (**ReadDoc**) may refuse to read CAPTCHA text due to safety
+policies around "bypassing security measures." This is expected — always route
+to the user.
 
 ## Page Flow Summary
 
