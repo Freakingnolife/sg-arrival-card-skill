@@ -2,7 +2,7 @@
 name: sg-arrival-card
 description: Submit Singapore Arrival Cards (SGAC) via the ICA e-services portal. Covers SC/PR, Long-Term Pass Holder, and Foreign Visitor pathways, Angular form quirks, CAPTCHA handling, and group submissions.
 version: 1.0.0
-author: SGAC Skill Contributors
+author: sgdadbuilds
 license: MIT
 platforms: [linux]
 metadata:
