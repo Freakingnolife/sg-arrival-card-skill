@@ -55,7 +55,10 @@ This skill is designed for AI agents with browser automation capabilities (e.g. 
 ## Requirements
 
 - Browser with CDP (Chrome DevTools Protocol) access
-- `browser_navigate`, `browser_click`, `browser_type`, `browser_console` tools
+- `browser_navigate`, `browser_click`, `browser_type`, `browser_press`,
+  `browser_console` tools (`browser_press` is required for the Tab-to-validate
+  step on Angular forms)
+- `execute_code` for decoding/saving the CAPTCHA image
 - `vision_analyze` for reading passport/LTVP documents
 - Messaging capability to send CAPTCHA images to a human user
 

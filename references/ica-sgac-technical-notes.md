@@ -129,8 +129,9 @@ Landing → Submit SGAC → Select Residency Type →
 
 ## Timing Notes
 
-- Can submit **3 days before arrival** (including arrival day)
-- Date buttons show: today, tomorrow, day-after-tomorrow
-- If arrival is more than 3 days out, the date button won't appear — wait
+- Can submit within a **3-day window**: arrival day plus the 2 days before it
+- Date buttons show: today, tomorrow, day-after-tomorrow (arrival 0–2 days out)
+- If arrival is 3 or more days out (beyond day-after-tomorrow), no date button
+  appears yet — wait until the window opens
 - Estimated completion: 5-7 mins per person (per ICA's own estimate)
 - CAPTCHA may refresh if you take too long — don't leave the form idle

@@ -1,6 +1,6 @@
 ---
 name: sg-arrival-card
-description: Submit Singapore Arrival Cards (SGAC) via the ICA e-services portal. Covers SC/PR and LTVP pathways, Angular form quirks, CAPTCHA handling, and group submissions.
+description: Submit Singapore Arrival Cards (SGAC) via the ICA e-services portal. Covers SC/PR, Long-Term Pass Holder, and Foreign Visitor pathways, Angular form quirks, CAPTCHA handling, and group submissions.
 platforms: [linux]
 ---
 
@@ -14,7 +14,8 @@ browser-automation quirks.
 ## When This Applies
 
 - Travellers returning to Singapore from overseas
-- Can submit **up to 3 days before** arrival date (including arrival day)
+- Can submit within a **3-day window**: the arrival day plus the 2 days before
+  it (i.e. arrival is 0–2 days out)
 - Required for: SC citizens, PRs, LTVP holders, foreign visitors — everyone
   except transit passengers who don't pass immigration
 
