@@ -21,8 +21,14 @@ sg-arrival-card-skill/
 ├── SKILL.md                              # Main skill documentation
 ├── README.md                             # This file
 ├── LICENSE                               # MIT License
-└── references/
-    └── ica-sgac-technical-notes.md       # Detailed Angular form interaction patterns
+├── references/
+│   └── ica-sgac-technical-notes.md       # Detailed Angular form interaction patterns
+└── scripts/                              # Bundled browser-automation helpers
+    ├── js_click_by_text.js               # JS-click an Angular button by text
+    ├── set_health_no.js                  # Set health toggles to NO (confirmed answers only)
+    ├── check_declaration.js              # Tick the review-page declaration checkbox
+    ├── extract_captcha.js                # Extract the CAPTCHA image (chunked)
+    └── save_captcha.py                   # Decode + save the CAPTCHA PNG
 ```
 
 ## Key Features
@@ -45,8 +51,17 @@ Multiple travellers on the same pathway can be submitted together using the "Add
 
 ### CAPTCHA Handling
 - Extracts CAPTCHA image as base64 from the dialog
-- Saves to PNG and sends to the user via messaging platform
+- Saves to PNG and sends it back to the user **in the same conversation/DM**,
+  delivered losslessly (`[[as_document]]`) so the distorted text stays legible
 - User reads and returns the code; agent types it in
+
+### Safety
+- **Health declarations** are answered from the traveller's actual status —
+  never auto-answered NO (a false declaration to ICA is an offence)
+- **Explicit user confirmation** is required before the final, non-editable
+  submission
+- **Traveller PII** (passport/NRIC/FIN) is kept in an uncommitted local data
+  file — never committed to the repo
 
 ## Usage
 

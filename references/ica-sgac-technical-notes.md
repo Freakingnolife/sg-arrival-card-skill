@@ -44,6 +44,10 @@ input.dispatchEvent(new Event('input'));  // Sometimes works, sometimes doesn't
 Custom Angular components (`icaib_button_yn` class). Selected state is tracked
 via `button_Selected` CSS class, not a native radio/checkbox.
 
+> ⚠️ The health-declaration YES/NO buttons are official declarations. Set them
+> from the traveller's **actual** answer — never blanket-click NO. The
+> `scripts/set_health_no.js` helper only applies once a NO answer is confirmed.
+
 Check state:
 ```javascript
 document.querySelectorAll('button').forEach(b => {
@@ -52,26 +56,15 @@ document.querySelectorAll('button').forEach(b => {
 });
 ```
 
-Click all unselected NO buttons:
-```javascript
-(function() {
-  let count = 0;
-  document.querySelectorAll('button').forEach(b => {
-    if (b.textContent.trim() === 'NO' && !b.className.includes('button_Selected')) {
-      b.click(); count++;
-    }
-  });
-  return count + ' clicked';
-})()
-```
+Set confirmed-NO buttons (bundled helper — only after confirming the answer):
+`${HERMES_SKILL_DIR}/scripts/set_health_no.js`
 
 ### Declaration Checkbox
 
 On the review page, the declaration checkbox is a native `<input type="checkbox">`
-but `browser_click` on the ref may not register. JS click works:
-```javascript
-document.querySelector('input[type="checkbox"]').click();
-```
+but `browser_click` on the ref may not register. JS click works — use the
+bundled helper, which ticks it and returns the resulting state:
+`${HERMES_SKILL_DIR}/scripts/check_declaration.js`
 
 Verify: `document.querySelector('input[type="checkbox"]').checked` → `true`
 
@@ -82,30 +75,15 @@ in an `<img>` tag inside a `[role="dialog"]` container.
 
 ### Full extraction + save pattern
 
-```python
-# In execute_code — extract base64 from browser_console, then save
-import base64
+Two bundled helpers do this — no inline generation needed:
 
-# Step 1: Get chunks via browser_console (data URLs can be long)
-# browser_console expression:
-# (function() {
-#   const d = document.querySelector('[role="dialog"]');
-#   const img = d?.querySelector('img');
-#   if (!img) return JSON.stringify({error: 'no image'});
-#   const src = img.src;
-#   const chunkSize = 2000;
-#   const chunks = [];
-#   for (let i = 0; i < src.length; i += chunkSize)
-#     chunks.push(src.substring(i, i + chunkSize));
-#   return JSON.stringify({total: src.length, numChunks: chunks.length, chunks: chunks});
-# })()
-
-# Step 2: Reassemble and save (in execute_code)
-# data_url = 'data:image/png;base64,' + ''.join(chunks)
-# b64_data = data_url.split(',')[1]
-# with open('/tmp/captcha_sgac.png', 'wb') as f:
-#     f.write(base64.b64decode(b64_data))
-```
+1. **Extract** via `browser_console`:
+   `${HERMES_SKILL_DIR}/scripts/extract_captcha.js` — returns
+   `{total, numChunks, chunks}` (chunked so long data URLs survive the return).
+2. **Reassemble + save** via `execute_code`:
+   `${HERMES_SKILL_DIR}/scripts/save_captcha.py` — pass the `chunks` list to
+   `save_captcha(chunks)`; it base64-decodes and writes the PNG (default
+   `/tmp/captcha_sgac.png`).
 
 ### Sending to user
 
@@ -113,6 +91,10 @@ Send the CAPTCHA image back to the user **in the same conversation/DM the
 request came from** via `send_message` with `MEDIA:<path>`, then use `clarify`
 to ask for the CAPTCHA text in that same thread. Always reply to the active
 conversation — do not route to a separate or hardcoded channel.
+
+Use the `[[as_document]]` directive when sending the image so it is delivered
+**losslessly** — messaging-platform compression can blur the distorted text and
+make the CAPTCHA unreadable.
 
 ### Vision model limitation
 
@@ -125,7 +107,7 @@ conversation — do not route to a separate or hardcoded channel.
 Landing → Submit SGAC → Select Residency Type →
   Form (Traveller Info) → [Add Traveller if needed] → Next →
     Review → Check declaration → Next →
-      CAPTCHA → Submit →
+      Confirm details with user → CAPTCHA → Submit →
         Confirmation → Make Another Submission / Return to Home
 ```
 

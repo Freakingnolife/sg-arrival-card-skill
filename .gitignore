@@ -1,0 +1,11 @@
+# Traveller PII — never commit (passports, NRIC/FIN, DOB, emails)
+data/
+*traveller_documents*
+
+# CAPTCHA temp images
+captcha_sgac.png
+*captcha*.png
+
+# Python bytecode
+__pycache__/
+*.pyc
